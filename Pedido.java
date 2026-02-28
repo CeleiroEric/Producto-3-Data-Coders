@@ -19,7 +19,6 @@ public class Pedido {
         this.fechaHora = (fechaHora == null) ? LocalDateTime.now() : fechaHora;
     }
 
-    // --- LÓGICA DE NEGOCIO ---
 
     /**
      * Calcula si el pedido se puede cancelar comparando la hora actual
@@ -48,7 +47,7 @@ public class Pedido {
         return (subtotal + gastos) * (1 - descuento);
     }
 
-    // --- GETTERS (Requeridos por TiendaOnline) ---
+    // --- GETTERS ---
 
     public int getNumPedido() {
         return numPedido;
@@ -70,7 +69,8 @@ public class Pedido {
         return fechaHora;
     }
 
-    // --- MÉTODOS DE OBJETO ---
+    
+    // --- MÉTODOS ---
 
     @Override
     public String toString() {
