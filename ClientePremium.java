@@ -27,7 +27,7 @@ public class ClientePremium extends Cliente {
     public String getTipo() {
         return "Premium";
     }
-    //Cambiar al correcto nombre
+    //Cambiar al correcto nombre //Hecho
     @Override
     public double getFactorEnvio(Articulo articulo){
         return articulo.getGastosEnvio() * 0.80;
@@ -35,5 +35,5 @@ public class ClientePremium extends Cliente {
     public String toString(){
         return super.toString() + "Tipo: Premium " + "/ Cuota anual: " + cuota_anual
                 + "/ Descuento: " + descuento;
-    }
-    }
+    }   
+}

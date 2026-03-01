@@ -68,7 +68,7 @@ public class TiendaOnline {
 
     /**
      * Crea un pedido. Según el enunciado, si el cliente no existe se debe registrar.
-     * Aquí lo resolvemos: si no existe, lo creamos a partir de datosCliente.
+     * Si no existe, lo creamos a partir de datosCliente.
      *
      * Formato datosCliente:
      *   "nombre|domicilio|nif|tipo"
@@ -180,7 +180,6 @@ public class TiendaOnline {
     }
 
     private Cliente crearClienteDesdeDatos(String email, String datosCliente) {
-        // Valores por defecto si no hay datos
         String nombre = "N/D";
         String domicilio = "N/D";
         String nif = "N/D";
@@ -194,7 +193,8 @@ public class TiendaOnline {
             if (parts.length > 3 && !parts[3].isBlank()) tipo = parts[3].trim().toLowerCase();
         }
 
-        // OJO: Ajustar el constructor si vuestra clase ClienteEstandar/ClientePremium tiene otra firma.
+        // Pere: Antes se devolvía Cliente_premium, sin barra baja.
+        // Ahora devolvemos ClientePremium o ClienteEstandar.
         if ("premium".equals(tipo)) {
             return new ClientePremium(nombre, domicilio, nif, email);
         }
