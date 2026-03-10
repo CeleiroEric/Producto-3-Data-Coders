@@ -1,5 +1,7 @@
-package datacoders.modelo.Excepciones;
+package datacoders.modelo.excepciones;
 
-public class PedidoNoEncontradoException {
-
+public class PedidoNoEncontradoException extends Exception {
+    public PedidoNoEncontradoException(String message) {
+        super(message);
+    }
 }

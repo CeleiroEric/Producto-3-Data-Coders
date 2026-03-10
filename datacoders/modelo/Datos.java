@@ -14,12 +14,10 @@ import java.util.*;
  * - Requisito del anexo: "Datos contendrá todos los datos de la aplicación y llevará a cabo
  *   todas las acciones que afectan a las mismas."
  *
- * MOD (diseño): usamos colecciones óptimas:
+ * MOD (diseño): usamos colecciones:
  * - Clientes por email: Map<String, Cliente>  (búsqueda O(1))
  * - Artículos por código: Map<String, Articulo> (búsqueda O(1))
  * - Pedidos por número: Map<Integer, Pedido>
- *
- * Nota: NO hay I/O aquí (no Scanner, no System.out).
  */
 public class Datos {
 
@@ -28,7 +26,6 @@ public class Datos {
     private final Map<Integer, Pedido> pedidosPorNumero;
 
     public Datos() {
-        // LinkedHashMap conserva orden de inserción -> listados más “amigables” en consola
         this.clientesPorEmail = new LinkedHashMap<>();
         this.articulosPorCodigo = new LinkedHashMap<>();
         this.pedidosPorNumero = new LinkedHashMap<>();
@@ -123,7 +120,7 @@ public class Datos {
     // =========================
 
     /**
-     * Regla del enunciado: al añadir pedido,
+     * Al añadir pedido,
      * - el artículo debe existir
      * - si el cliente no existe, se registra (con datosCliente)
      */

@@ -1,5 +1,3 @@
-
-
 import datacoders.modelo.Articulo;
 import datacoders.modelo.Cliente;
 import datacoders.modelo.Datos;
@@ -28,7 +26,7 @@ public class Controlador {
         this.datos = new Datos();
     }
 
-    // Útil para tests o para inyección de dependencias
+    // Útil para tests
     public Controlador(Datos datos) {
         this.datos = datos;
     }

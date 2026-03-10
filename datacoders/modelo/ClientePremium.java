@@ -1,3 +1,5 @@
+package datacoders.modelo;
+
 public class ClientePremium extends Cliente {
     private double cuota_anual;
     private double descuento;

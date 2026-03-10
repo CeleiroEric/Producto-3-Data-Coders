@@ -1,3 +1,5 @@
+package datacoders.modelo;
+
 import java.util.Objects;
 
 public class Articulo {

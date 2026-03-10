@@ -1,3 +1,5 @@
+package datacoders.modelo;
+
 public class ClienteEstandar extends Cliente{
 
     public ClienteEstandar(String nombre, String domicilio, String nif, String email){
