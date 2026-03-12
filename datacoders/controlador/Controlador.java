@@ -1,3 +1,5 @@
+package datacoders.controlador;
+
 import datacoders.modelo.Articulo;
 import datacoders.modelo.Cliente;
 import datacoders.modelo.Datos;
