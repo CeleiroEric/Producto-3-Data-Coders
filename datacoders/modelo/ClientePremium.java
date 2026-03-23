@@ -5,7 +5,7 @@ public class ClientePremium extends Cliente {
     private double descuento;
 
     public ClientePremium(String nombre, String domicilio, String nif, String email) {
-        super(nombre, domicilio, nif, email);
+        super(nombre, domicilio, nif, email,true);
         this.cuota_anual = 30.0;
         this.descuento = 0.20;
     }
@@ -32,10 +32,15 @@ public class ClientePremium extends Cliente {
     //Cambiar al correcto nombre //Hecho
     @Override
     public double getFactorEnvio(Articulo articulo){
-        return articulo.getGastosEnvio() * 0.80;
+        // En lugar de 0.80 fijo, usamos (1 - 0.20) para que sea dinámico
+        return articulo.getGastosEnvio() * (1 - this.descuento);
     }
+
+    @Override
     public String toString(){
-        return super.toString() + "Tipo: Premium " + "/ Cuota anual: " + cuota_anual
-                + "/ Descuento: " + descuento;
-    }   
+        // Añadimos @Override al toString por buena práctica
+        return super.toString() + " | Tipo: Premium" +
+                " | Cuota anual: " + cuota_anual + "€" +
+                " | Descuento aplicado: " + (descuento * 100) + "%";
+    }
 }

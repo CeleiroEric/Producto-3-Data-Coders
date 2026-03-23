@@ -1,107 +1,127 @@
 package datacoders.controlador;
 
-import datacoders.modelo.Articulo;
-import datacoders.modelo.Cliente;
-import datacoders.modelo.Datos;
-import datacoders.modelo.Pedido;
-
-import datacoders.modelo.excepciones.ArticuloNoEncontradoException;
-import datacoders.modelo.excepciones.DuplicadoException;
-import datacoders.modelo.excepciones.PedidoNoCancelableException;
-import datacoders.modelo.excepciones.PedidoNoEncontradoException;
-import datacoders.modelo.excepciones.ClienteNoEncontradoException;
-
+import datacoders.dao.*;
+import datacoders.modelo.*;
+import datacoders.modelo.excepciones.*;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
-/**
- * Controlador (MVC)
- * - La Vista solo habla con el Controlador.
- * - El Controlador delega en Datos (Modelo).
- * - El Controlador NO hace I/O (no System.out, no Scanner).
- */
 public class Controlador {
 
-    private final Datos datos;
+    // Instancias de los DAO (Capa de Persistencia)
+    private final ArticuloDao articuloDao = new ArticuloDao();
+    private final ClienteDao clienteDao = new ClienteDao();
+    private final PedidoDao pedidoDao = new PedidoDao();
 
     public Controlador() {
-        this.datos = new Datos();
+        // Constructor vacío
     }
 
-    // Útil para tests
-    public Controlador(Datos datos) {
-        this.datos = datos;
-    }
+    // =========================================================================
+    // GESTIÓN DE ARTÍCULOS
+    // =========================================================================
 
-    // =========================
-    // ARTÍCULOS
-    // =========================
-    public boolean addArticulo(String codigo, String descripcion, double precioVenta,
-                               double gastosEnvio, int tiempoPreparacionMin)
-            throws DuplicadoException {
-
-        Articulo a = new Articulo(codigo, descripcion, precioVenta, gastosEnvio, tiempoPreparacionMin);
-        return datos.addArticulo(a);
+    public boolean addArticulo(String cod, String desc, double precio, double env, int tiempo) throws DuplicadoException {
+        try {
+            articuloDao.insertar(new Articulo(cod, desc, precio, env, tiempo));
+            return true;
+        } catch (SQLException e) {
+            // El código 1062 en MySQL indica una entrada duplicada (Primary Key)
+            if (e.getErrorCode() == 1062) throw new DuplicadoException("El código '" + cod + "' ya existe.");
+            return false;
+        }
     }
 
     public List<Articulo> getArticulos() {
-        return datos.getArticulos();
+        try {
+            return articuloDao.listar();
+        } catch (SQLException e) {
+            return List.of();
+        }
     }
 
-    public Articulo buscarArticuloPorCodigo(String codigo) throws ArticuloNoEncontradoException {
-        return datos.buscarArticuloPorCodigo(codigo);
+    // =========================================================================
+    // GESTIÓN DE CLIENTES
+    // =========================================================================
+
+    public boolean addClienteEstandar(String n, String d, String ni, String em) throws DuplicadoException {
+        try {
+            clienteDao.insertar(new ClienteEstandar(n, d, ni, em));
+            return true;
+        } catch (SQLException e) {
+            if (e.getErrorCode() == 1062) throw new DuplicadoException("El cliente con NIF/Email ya existe.");
+            return false;
+        }
     }
 
-    // =========================
-    // CLIENTES
-    // =========================
-    public boolean addClienteEstandar(String nombre, String domicilio, String nif, String email)
-            throws DuplicadoException {
-        return datos.addClienteEstandar(nombre, domicilio, nif, email);
-    }
-
-    public boolean addClientePremium(String nombre, String domicilio, String nif, String email)
-            throws DuplicadoException {
-        return datos.addClientePremium(nombre, domicilio, nif, email);
+    public boolean addClientePremium(String n, String d, String ni, String em) throws DuplicadoException {
+        try {
+            clienteDao.insertar(new ClientePremium(n, d, ni, em));
+            return true;
+        } catch (SQLException e) {
+            if (e.getErrorCode() == 1062) throw new DuplicadoException("El cliente con NIF/Email ya existe.");
+            return false;
+        }
     }
 
     public List<Cliente> getClientes() {
-        return datos.getClientes();
+        try {
+            return clienteDao.listar();
+        } catch (SQLException e) {
+            return List.of();
+        }
     }
 
     public List<Cliente> getClientesEstandar() {
-        return datos.getClientesEstandar();
+        return getClientes().stream()
+                .filter(c -> !(c instanceof ClientePremium))
+                .collect(Collectors.toList());
     }
 
     public List<Cliente> getClientesPremium() {
-        return datos.getClientesPremium();
+        return getClientes().stream()
+                .filter(c -> c instanceof ClientePremium)
+                .collect(Collectors.toList());
     }
 
-    public Cliente buscarClientePorEmail(String email) throws ClienteNoEncontradoException {
-        return datos.buscarClientePorEmail(email);
+    // =========================================================================
+    // GESTIÓN DE PEDIDOS
+    // =========================================================================
+
+    public void addPedido(String email, String dummy, String cod, int cant, LocalDateTime fecha) throws Exception {
+        try {
+            // IMPORTANTE: El orden debe ser email (String), cod (String), cant (int), fecha (LocalDateTime)
+            pedidoDao.insertar(email, cod, cant, fecha);
+        } catch (SQLException e) {
+            throw new Exception("Error en BD: " + e.getMessage());
+        }
     }
 
-    // =========================
-    // PEDIDOS
-    // =========================
-    public Pedido addPedido(String emailCliente, String datosCliente, String codigoArticulo,
-                            int cantidad, LocalDateTime ahora)
-            throws ArticuloNoEncontradoException, DuplicadoException {
-
-        // Nota: el enunciado dice que si el cliente NO existe se registra. Por eso NO lanzamos ClienteNoEncontrado.
-        return datos.addPedido(emailCliente, datosCliente, codigoArticulo, cantidad, ahora);
+    public void eliminarPedido(int num, LocalDateTime ahora) throws PedidoNoCancelableException {
+        try {
+            // Se delega la lógica de borrado al DAO
+            pedidoDao.eliminar(num);
+        } catch (SQLException e) {
+            throw new PedidoNoCancelableException("No se puede eliminar el pedido #" + num + ". Puede que ya esté enviado.");
+        }
     }
 
-    public boolean eliminarPedido(int numPedido, LocalDateTime ahora)
-            throws PedidoNoEncontradoException, PedidoNoCancelableException {
-        return datos.eliminarPedido(numPedido, ahora);
+    public List<Pedido> getPedidosPendientes(String email) {
+        try {
+            // Corregido: pasamos 'email' directamente sin el tipo de dato
+            return pedidoDao.listarPendientes(email);
+        } catch (SQLException e) {
+            return List.of();
+        }
     }
 
-    public List<Pedido> getPedidosPendientes(String emailCliente) {
-        return datos.getPedidosPendientes(emailCliente);
-    }
-
-    public List<Pedido> getPedidosEnviados(String emailCliente) {
-        return datos.getPedidosEnviados(emailCliente);
+    public List<Pedido> getPedidosEnviados(String email) {
+        try {
+            return pedidoDao.listarEnviados(email);
+        } catch (SQLException e) {
+            return List.of();
+        }
     }
 }
