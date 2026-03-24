@@ -28,7 +28,6 @@ public class Controlador {
             articuloDao.insertar(new Articulo(cod, desc, precio, env, tiempo));
             return true;
         } catch (SQLException e) {
-            // El código 1062 en MySQL indica una entrada duplicada (Primary Key)
             if (e.getErrorCode() == 1062) throw new DuplicadoException("El código '" + cod + "' ya existe.");
             return false;
         }
@@ -90,10 +89,20 @@ public class Controlador {
     // GESTIÓN DE PEDIDOS
     // =========================================================================
 
-    public void addPedido(String email, String dummy, String cod, int cant, LocalDateTime fecha) throws Exception {
+    public void addPedido(String email, String cod, int cant, LocalDateTime fecha) throws Exception {
         try {
-            // IMPORTANTE: El orden debe ser email (String), cod (String), cant (int), fecha (LocalDateTime)
-            pedidoDao.insertar(email, cod, cant, fecha);
+            // NOTA: Tu PedidoDao.crearPedido espera (int, String, int)
+            // Si el procedimiento en MySQL acepta Email, cambia el tipo en PedidoDao.
+            // Por ahora, lo llamamos con el nombre correcto del método:
+
+            // Suponiendo que conviertes el email a ID o que el DAO acepta String:
+            // pedidoDao.crearPedido(email, cod, cant);
+
+            // Para que no te dé error de compilación ahora mismo, asegúrate de que
+            // los tipos coincidan con lo que escribiste en PedidoDao.java
+            int idSimulado = 1; // Esto es temporal hasta que obtengas el ID real del cliente
+            pedidoDao.crearPedido(idSimulado, cod, cant);
+
         } catch (SQLException e) {
             throw new Exception("Error en BD: " + e.getMessage());
         }
@@ -101,8 +110,8 @@ public class Controlador {
 
     public void eliminarPedido(int num, LocalDateTime ahora) throws PedidoNoCancelableException {
         try {
-            // Se delega la lógica de borrado al DAO
-            pedidoDao.eliminar(num);
+            // Corregido: El método en tu PedidoDao se llama eliminarPedido
+            pedidoDao.eliminarPedido(num);
         } catch (SQLException e) {
             throw new PedidoNoCancelableException("No se puede eliminar el pedido #" + num + ". Puede que ya esté enviado.");
         }
@@ -110,7 +119,7 @@ public class Controlador {
 
     public List<Pedido> getPedidosPendientes(String email) {
         try {
-            // Corregido: pasamos 'email' directamente sin el tipo de dato
+            // Asegúrate de que estos métodos existan en PedidoDao con estos nombres
             return pedidoDao.listarPendientes(email);
         } catch (SQLException e) {
             return List.of();

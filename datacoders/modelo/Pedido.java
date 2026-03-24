@@ -21,7 +21,6 @@ public class Pedido {
         this.fechaHora = (fechaHora == null) ? LocalDateTime.now() : fechaHora;
     }
 
-
     /**
      * Calcula si el pedido se puede cancelar comparando la hora actual
      * con el tiempo de preparación del artículo.
@@ -37,14 +36,18 @@ public class Pedido {
     }
 
     /**
-     * Calcula el coste total del pedido
+     * Calcula el coste total del pedido aplicando lógica de la Persona 2
      */
     public double calcularTotal() {
         double subtotal = articulo.getPrecioVenta() * cantidad;
-        //Si el cliente tiene descuento se aplica directamente en este metodo
-        double gastos = cliente.getFactorEnvio(articulo);
+        double gastosEnvio = articulo.getGastosEnvio();
 
-        return (subtotal + gastos);
+        // Lógica de Negocio: Si el cliente es Premium, aplicamos un 20% de descuento en el envío
+        if (cliente.isPremium()) {
+            gastosEnvio = gastosEnvio * 0.8;
+        }
+
+        return subtotal + gastosEnvio;
     }
 
     // --- GETTERS ---
@@ -69,7 +72,6 @@ public class Pedido {
         return fechaHora;
     }
 
-    
     // --- MÉTODOS ---
 
     @Override

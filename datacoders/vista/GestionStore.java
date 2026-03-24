@@ -1,18 +1,16 @@
-
 package datacoders.vista;
 
 import datacoders.modelo.*;
 import datacoders.controlador.*;
+import java.time.LocalDateTime;
 
 public class GestionStore {
 
     private Controlador controlador;
 
-
-    public GestionStore () {
+    public GestionStore() {
         this.controlador = new Controlador();
     }
-
 
     public void inicio() {
         boolean salir = false;
@@ -22,8 +20,6 @@ public class GestionStore {
             System.out.println("2. Gestión de Clientes");
             System.out.println("3. Gestión de Pedidos");
             System.out.println("0. Salir");
-
-
 
             int opcion = LeerDatos.leerEntero("Selecciona una opción: ");
 
@@ -37,16 +33,12 @@ public class GestionStore {
         } while (!salir);
     }
 
-
-
     // --- SUBMENÚ ARTÍCULOS ---
     private void menuArticulos() {
         System.out.println("\n-- ARTÍCULOS --");
         System.out.println("1. Añadir Artículo");
         System.out.println("2. Mostrar Artículos");
         int opt = LeerDatos.leerEntero("Selecciona: ");
-
-
 
         if (opt == 1) {
             String cod = LeerDatos.leerTexto("Código: ");
@@ -62,15 +54,11 @@ public class GestionStore {
                 System.out.println("Error: " + e.getMessage());
             }
         } else {
-            // Usamos getArticulos() que es el nombre real en tu controlador
             System.out.println(controlador.getArticulos());
         }
     }
 
-
-
     // --- SUBMENÚ CLIENTES ---
-
     private void menuClientes() {
         System.out.println("\n-- CLIENTES --");
         System.out.println("1. Añadir Cliente");
@@ -78,18 +66,15 @@ public class GestionStore {
         System.out.println("3. Mostrar Clientes Estándar");
         System.out.println("4. Mostrar Clientes Premium");
 
-        // Solo una vez cada variable
         int opt = LeerDatos.leerEntero("Selecciona: ");
 
         if (opt == 1) {
             String email = LeerDatos.leerTexto("Email: ");
             String nombre = LeerDatos.leerTexto("Nombre: ");
-            // CAMBIO: Usa el nombre 'domicilio' para que coincida con lo de abajo
             String domicilio = LeerDatos.leerTexto("Domicilio: ");
             String nif = LeerDatos.leerTexto("NIF: ");
             String tipo = LeerDatos.leerTexto("Tipo (Estandar/Premium): ");
 
-            // Ahora 'domicilio' ya existe y no dará error
             try {
                 if (tipo.equalsIgnoreCase("Estandar")) {
                     controlador.addClienteEstandar(nombre, domicilio, nif, email);
@@ -101,7 +86,6 @@ public class GestionStore {
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
             }
-
 
         } else if (opt == 2) {
             System.out.println("--- Lista de todos los Clientes ---");
@@ -118,14 +102,13 @@ public class GestionStore {
     }
 
     // --- SUBMENÚ PEDIDOS ---
-
-private void menuPedidos() {
-    System.out.println("\n-- PEDIDOS --");
-    System.out.println("1. Añadir Pedido");
-    System.out.println("2. Eliminar Pedido");
-    System.out.println("3. Mostrar Pedidos Pendientes");
-    System.out.println("4. Mostrar Pedidos Enviados");
-    int opt = LeerDatos.leerEntero("Selecciona: ");
+    private void menuPedidos() {
+        System.out.println("\n-- PEDIDOS --");
+        System.out.println("1. Añadir Pedido");
+        System.out.println("2. Eliminar Pedido");
+        System.out.println("3. Mostrar Pedidos Pendientes");
+        System.out.println("4. Mostrar Pedidos Enviados");
+        int opt = LeerDatos.leerEntero("Selecciona: ");
 
         try {
             switch (opt) {
@@ -133,14 +116,15 @@ private void menuPedidos() {
                     String email = LeerDatos.leerTexto("Email Cliente: ");
                     String cod = LeerDatos.leerTexto("Código Artículo: ");
                     int cant = LeerDatos.leerEntero("Cantidad: ");
-                    // Añadimos la fecha actual como 5º parámetro
-                    controlador.addPedido(email, "", cod, cant, java.time.LocalDateTime.now());
+
+                    // CORRECCIÓN: Ahora pasamos exactamente 4 parámetros: (String, String, int, LocalDateTime)
+                    controlador.addPedido(email, cod, cant, LocalDateTime.now());
+
                     System.out.println("Pedido añadido con éxito.");
                 }
                 case 2 -> {
                     int num = LeerDatos.leerEntero("Número de pedido a cancelar: ");
-                    // Añadimos la fecha actual como 2º parámetro
-                    controlador.eliminarPedido(num, java.time.LocalDateTime.now());
+                    controlador.eliminarPedido(num, LocalDateTime.now());
                     System.out.println("Pedido cancelado (si cumplía las condiciones).");
                 }
                 case 3 -> {
@@ -156,4 +140,4 @@ private void menuPedidos() {
             System.out.println("Error: " + e.getMessage());
         }
     }
-} // <--- ESTA ES LA ÚLTIMA LLAVE QUE CIERRA LA CLASE
+}

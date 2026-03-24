@@ -6,7 +6,7 @@ import java.sql.*;
         import java.util.ArrayList;
 import java.util.List;
 
-public class ArticuloDao {
+public class ArticuloDao implements ArticuloDAOInterface {
 
     public void insertar(Articulo articulo) throws SQLException {
         String sql = "INSERT INTO articulos (codigo_articulo, descripcion, precio_venta, gastos_envio, tiempo_preparacion) VALUES (?, ?, ?, ?, ?)";
