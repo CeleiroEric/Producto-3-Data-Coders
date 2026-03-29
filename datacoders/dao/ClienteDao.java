@@ -1,5 +1,6 @@
 package datacoders.dao;
 
+import datacoders.dao.interfaces.ClienteDAOInterface;
 import datacoders.modelo.Cliente;
 import java.sql.*;
 import java.util.ArrayList;

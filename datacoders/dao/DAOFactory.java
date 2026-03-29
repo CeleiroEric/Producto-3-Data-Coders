@@ -1,5 +1,8 @@
 package datacoders.dao;
 
+import datacoders.dao.interfaces.*;
+import datacoders.dao.*;
+
 public class DAOFactory {
 
     // Devolvemos la interfaz, pero instanciamos la clase concreta
@@ -11,7 +14,7 @@ public class DAOFactory {
         return new ClienteDao();
     }
 
-    public static PedidoDAOInterface getPedidoDAO() {
+    public static datacoders.dao.PedidoDAOInterface getPedidoDAO() {
         return new PedidoDao();
     }
 }

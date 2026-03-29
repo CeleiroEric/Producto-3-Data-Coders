@@ -9,7 +9,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PedidoDao implements PedidoDAOInterface {
+public class PedidoDao implements datacoders.dao.PedidoDAOInterface {
 
     // Llamamos al procedimiento sp_crear_pedido que creamos en MySQL
     public void crearPedido(int idCliente, String codigoArticulo, int cantidad) throws SQLException {
