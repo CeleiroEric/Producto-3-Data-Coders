@@ -43,7 +43,7 @@ public class PruebaControlador {
             }
 
         } catch (Exception e) {
-            System.err.println("❌ Error inesperado en el test:");
+            System.err.println("Error inesperado en el test:");
             e.printStackTrace();
         }
     }

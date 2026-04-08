@@ -117,8 +117,16 @@ public class GestionStore {
                     String cod = LeerDatos.leerTexto("Código Artículo: ");
                     int cant = LeerDatos.leerEntero("Cantidad: ");
 
-                    // CORRECCIÓN: Ahora pasamos exactamente 4 parámetros: (String, String, int, LocalDateTime)
-                    controlador.addPedido(email, cod, cant, LocalDateTime.now());
+                    // MOD (Persona 3):
+                    // Se recogen los datos del cliente por si no existe y hay que registrarlo.
+                    String nombre = LeerDatos.leerTexto("Nombre del cliente (si no existe): ");
+                    String domicilio = LeerDatos.leerTexto("Domicilio del cliente (si no existe): ");
+                    String nif = LeerDatos.leerTexto("NIF del cliente (si no existe): ");
+                    String tipo = LeerDatos.leerTexto("Tipo del cliente (Estandar/Premium): ");
+
+                    String datosCliente = nombre + "|" + domicilio + "|" + nif + "|" + tipo;
+
+                    controlador.addPedido(email, datosCliente, cod, cant, LocalDateTime.now());
 
                     System.out.println("Pedido añadido con éxito.");
                 }

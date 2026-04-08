@@ -1,4 +1,4 @@
-package datacoders.dao;
+package datacoders.dao.interfaces;
 
 import datacoders.modelo.Pedido;
 import java.sql.SQLException;
