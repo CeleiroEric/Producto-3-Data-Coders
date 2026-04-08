@@ -1,6 +1,6 @@
 package datacoders.dao.mysql;
 
-import datacoders.dao.ArticuloDAO;
+import datacoders.dao.ArticuloDao;
 import datacoders.modelo.Articulo;
 import datacoders.modelo.excepciones.ArticuloNoEncontradoException;
 import datacoders.modelo.excepciones.DuplicadoException;
@@ -10,7 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MySqlArticuloDAO implements ArticuloDAO {
+public class MySqlArticuloDAO implements ArticuloDao {
 
     @Override
     public boolean insert(Articulo a) throws DuplicadoException {

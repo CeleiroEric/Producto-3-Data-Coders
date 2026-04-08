@@ -1,6 +1,6 @@
 package datacoders.dao.mysql;
 
-import datacoders.dao.ClienteDAO;
+import datacoders.dao.ClienteDao;
 import datacoders.modelo.Cliente;
 import datacoders.modelo.ClienteEstandar;
 import datacoders.modelo.ClientePremium;
@@ -12,7 +12,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MySqlClienteDAO implements ClienteDAO {
+public class MySqlClienteDAO implements ClienteDao {
 
     @Override
     public boolean insertEstandar(String nombre, String domicilio, String nif, String email) throws DuplicadoException {

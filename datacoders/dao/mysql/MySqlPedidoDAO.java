@@ -1,6 +1,6 @@
 package datacoders.dao.mysql;
 
-import datacoders.dao.PedidoDAO;
+import datacoders.dao.PedidoDao;
 import datacoders.modelo.Articulo;
 import datacoders.modelo.Cliente;
 import datacoders.modelo.ClienteEstandar;
@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MySqlPedidoDAO implements PedidoDAO {
+public class MySqlPedidoDAO implements PedidoDao {
 
     @Override
     public Pedido crearPedido(String emailCliente, String datosCliente, String codigoArticulo,

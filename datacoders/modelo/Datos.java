@@ -1,8 +1,8 @@
 package datacoders.modelo;
 
-import datacoders.dao.ClienteDAO;
-import datacoders.dao.ArticuloDAO;
-import datacoders.dao.PedidoDAO;
+import datacoders.dao.ClienteDao;
+import datacoders.dao.ArticuloDao;
+import datacoders.dao.PedidoDao;
 import datacoders.factory.DAOFactory;
 import datacoders.modelo.excepciones.*;
 
@@ -12,9 +12,9 @@ import java.util.Objects;
 
 public class Datos {
 
-    private final ClienteDAO ClienteDAO;
-    private final ArticuloDAO ArticuloDAO;
-    private final PedidoDAO PedidoDAO;
+    private final ClienteDao ClienteDao;
+    private final ArticuloDao ArticuloDao;
+    private final PedidoDao PedidoDao;
 
     /**
      * Constructor principal usado por la aplicación.
@@ -27,12 +27,13 @@ public class Datos {
         // MOD (Persona 3):
         // Se usa Objects.requireNonNull para detectar antes y con mensaje claro
         // si la fábrica aún no devuelve implementaciones reales.
-        this.ClienteDAO = Objects.requireNonNull(factory.getClienteDAO(),
-                "ClienteDAO no inicializado en MySqlDAOFactory");
-        this.ArticuloDAO = Objects.requireNonNull(factory.getArticuloDAO(),
-                "ArticuloDAO no inicializado en MySqlDAOFactory");
-        this.PedidoDAO = Objects.requireNonNull(factory.getPedidoDAO(),
-                "PedidoDAO no inicializado en MySqlDAOFactory");
+
+        this.ClienteDao = Objects.requireNonNull(factory.getClienteDAO(),
+                "ClienteDao no inicializado en MySqlDAOFactory");
+        this.ArticuloDao = Objects.requireNonNull(factory.getArticuloDAO(),
+                "ArticuloDao no inicializado en MySqlDAOFactory");
+        this.PedidoDao = Objects.requireNonNull(factory.getPedidoDAO(),
+                "PedidoDao no inicializado en MySqlDAOFactory");
     }
 
     /**
@@ -41,10 +42,10 @@ public class Datos {
      * Permite inyectar DAO concretos sin depender de la fábrica.
      * No afecta al funcionamiento normal del programa.
      */
-    public Datos(ClienteDAO ClienteDAO, ArticuloDAO ArticuloDAO, PedidoDAO PedidoDAO) {
-        this.ClienteDAO = Objects.requireNonNull(ClienteDAO, "ClienteDAO no puede ser null");
-        this.ArticuloDAO = Objects.requireNonNull(ArticuloDAO, "ArticuloDAO no puede ser null");
-        this.PedidoDAO = Objects.requireNonNull(PedidoDAO, "PedidoDAO no puede ser null");
+    public Datos(ClienteDao ClienteDao, ArticuloDao ArticuloDao, PedidoDao PedidoDao) {
+        this.ClienteDao = Objects.requireNonNull(ClienteDao, "ClienteDAO no puede ser null");
+        this.ArticuloDao = Objects.requireNonNull(ArticuloDao, "ArticuloDAO no puede ser null");
+        this.PedidoDao = Objects.requireNonNull(PedidoDao, "PedidoDao no puede ser null");
     }
 
     // =========================
@@ -52,43 +53,43 @@ public class Datos {
     // =========================
     public boolean addClienteEstandar(String nombre, String domicilio, String nif, String email)
             throws DuplicadoException {
-        return ClienteDAO.insertEstandar(nombre, domicilio, nif, email);
+        return ClienteDao.insertEstandar(nombre, domicilio, nif, email);
     }
 
     public boolean addClientePremium(String nombre, String domicilio, String nif, String email)
             throws DuplicadoException {
-        return ClienteDAO.insertPremium(nombre, domicilio, nif, email);
+        return ClienteDao.insertPremium(nombre, domicilio, nif, email);
     }
 
     public Cliente buscarClientePorEmail(String email) throws ClienteNoEncontradoException {
-        return ClienteDAO.findByEmail(email);
+        return ClienteDao.findByEmail(email);
     }
 
     public List<Cliente> getClientes() {
-        return ClienteDAO.findAll();
+        return ClienteDao.findAll();
     }
 
     public List<Cliente> getClientesEstandar() {
-        return ClienteDAO.findAllEstandar();
+        return ClienteDao.findAllEstandar();
     }
 
     public List<Cliente> getClientesPremium() {
-        return ClienteDAO.findAllPremium();
+        return ClienteDao.findAllPremium();
     }
 
     // =========================
     // ARTÍCULOS
     // =========================
     public boolean addArticulo(Articulo a) throws DuplicadoException {
-        return ArticuloDAO.insert(a);
+        return ArticuloDao.insert(a);
     }
 
     public Articulo buscarArticuloPorCodigo(String codigo) throws ArticuloNoEncontradoException {
-        return ArticuloDAO.findByCodigo(codigo);
+        return ArticuloDao.findByCodigo(codigo);
     }
 
     public List<Articulo> getArticulos() {
-        return ArticuloDAO.findAll();
+        return ArticuloDao.findAll();
     }
 
     // =========================
@@ -98,33 +99,32 @@ public class Datos {
     /**
      * MOD (Persona 3):
      * Este método ya está adaptado a persistencia.
-     * La implementación real de negocio queda delegada en PedidoDAO.
-     *
+     * La implementación real de negocio queda delegada en PedidoDao.
      * NOTA PARA EL GRUPO:
-     * En Producto 3, PedidoDAO debería implementar esta operación usando
+     * En Producto 3, PedidoDao debería implementar esta operación usando
      * JDBC y, preferiblemente, un procedimiento almacenado para crear pedido.
      */
     public Pedido addPedido(String emailCliente, String datosCliente, String codigoArticulo,
                             int cantidad, LocalDateTime ahora)
             throws ArticuloNoEncontradoException, DuplicadoException {
-        return PedidoDAO.crearPedido(emailCliente, datosCliente, codigoArticulo, cantidad, ahora);
+        return PedidoDao.crearPedido(emailCliente, datosCliente, codigoArticulo, cantidad, ahora);
     }
 
     /**
      * MOD (Persona 3):
-     * La lógica de cancelación debe resolverse en PedidoDAO
+     * La lógica de cancelación debe resolverse en PedidoDao
      * usando persistencia real y, si corresponde, transacción/procedimiento almacenado.
      */
     public boolean eliminarPedido(int numPedido, LocalDateTime ahora)
             throws PedidoNoEncontradoException, PedidoNoCancelableException {
-        return PedidoDAO.eliminarPedido(numPedido, ahora);
+        return PedidoDao.eliminarPedido(numPedido, ahora);
     }
 
     public List<Pedido> getPedidosPendientes(String emailCliente) {
-        return PedidoDAO.findPendientes(emailCliente);
+        return PedidoDao.findPendientes(emailCliente);
     }
 
     public List<Pedido> getPedidosEnviados(String emailCliente) {
-        return PedidoDAO.findEnviados(emailCliente);
+        return PedidoDao.findEnviados(emailCliente);
     }
 }

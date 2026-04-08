@@ -1,8 +1,8 @@
 package datacoders.factory;
 
-import datacoders.dao.ArticuloDAO;
-import datacoders.dao.ClienteDAO;
-import datacoders.dao.PedidoDAO;
+import datacoders.dao.ArticuloDao;
+import datacoders.dao.ClienteDao;
+import datacoders.dao.PedidoDao;
 
 public abstract class DAOFactory {
 
@@ -15,7 +15,7 @@ public abstract class DAOFactory {
         throw new IllegalArgumentException("Tipo de factoría no soportado: " + tipo);
     }
 
-    public abstract ClienteDAO getClienteDAO();
-    public abstract ArticuloDAO getArticuloDAO();
-    public abstract PedidoDAO getPedidoDAO();
+    public abstract ClienteDao getClienteDAO();
+    public abstract ArticuloDao getArticuloDAO();
+    public abstract PedidoDao getPedidoDAO();
 }
