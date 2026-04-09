@@ -9,7 +9,7 @@ import datacoders.modelo.excepciones.PedidoNoEncontradoException;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface PedidoDAO {
+public interface PedidoDao {
     Pedido crearPedido(String emailCliente, String datosCliente, String codigoArticulo, int cantidad, LocalDateTime ahora)
             throws ArticuloNoEncontradoException, DuplicadoException;
 
