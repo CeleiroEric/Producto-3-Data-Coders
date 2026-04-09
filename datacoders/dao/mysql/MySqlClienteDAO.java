@@ -16,7 +16,8 @@ public class MySqlClienteDAO implements ClienteDao {
 
     @Override
     public boolean insertEstandar(String nombre, String domicilio, String nif, String email) throws DuplicadoException {
-        return insertCliente(nombre, domicilio, nif, email, "Estandard", 0.0, 0.0);
+        // CORREGIDO: "Estandar" sin la 'd' final para que coincida con el filtro de búsqueda
+        return insertCliente(nombre, domicilio, nif, email, "Estandar", 0.0, 0.0);
     }
 
     @Override
@@ -98,7 +99,7 @@ public class MySqlClienteDAO implements ClienteDao {
                 WHERE tipo = ?
                 ORDER BY email
                 """;
-
+        // Aquí buscas "Estandar", por eso el insert debía ser igual
         return ejecutarListado(sql, "Estandar");
     }
 
@@ -140,6 +141,7 @@ public class MySqlClienteDAO implements ClienteDao {
     private Cliente mapCliente(ResultSet rs) throws SQLException {
         String tipo = rs.getString("tipo");
 
+        // Usamos equalsIgnoreCase para ser más flexibles con mayúsculas/minúsculas
         if ("PREMIUM".equalsIgnoreCase(tipo)) {
             return new ClientePremium(
                     rs.getString("nombre"),
