@@ -6,7 +6,7 @@ import datacoders.modelo.excepciones.DuplicadoException;
 
 import java.util.List;
 
-public interface ClienteDAO {
+public interface ClienteDao {
     boolean insertEstandar(String nombre, String domicilio, String nif, String email) throws DuplicadoException;
     boolean insertPremium(String nombre, String domicilio, String nif, String email) throws DuplicadoException;
 
