@@ -1,0 +1,19 @@
+Nota de explicacion:
+
+He pasado las clases de Java a tres tablas principales: articulos, clientes y pedidos.
+
+En articulos, el código es único para que no se repitan productos.
+
+Para los clientes, he metido los estándar y los premium en una misma tabla usando una columna "tipo" para diferenciarlos, así es mucho más fácil de gestionar.
+
+En pedidos, he usado claves foráneas que conectan con los IDs de clientes y artículos, así aseguramos la integridad referencial.
+
+Para el tema de la integridad, he puesto restricciones para que no se pueda borrar un cliente o un artículo si tiene pedidos activos, así evitamos lios.
+
+Tambien he creado los procedimientos almacenados: uno para crear pedidos usando una transacción (asi si falla algo a mitad, no se guarda nada) y otro para borrar pedidos que comprueba automáticamente si todavía estamos a tiempo de cancelarlo.
+
+Los archivos están listos para ejecutar pero tienen que seguir el orden:
+1.schema
+2.procedures
+3.seed
+
