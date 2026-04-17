@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="DATACODERS">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$" />
+      <root url="jar://$PROJECT_DIR$/lib/antlr4-runtime-4.13.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/byte-buddy-1.14.11.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/classmate-1.5.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hibernate-core-6.4.4.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jakarta.persistence-api-3.1.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$" />
+    </SOURCES>
+  </library>
+</component>

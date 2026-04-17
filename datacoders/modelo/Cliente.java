@@ -1,13 +1,28 @@
 package datacoders.modelo;
 
+import jakarta.persistence.*; // Importante para las anotaciones
+
+@Entity
+@Table(name = "clientes")
+@Inheritance(strategy = InheritanceType.JOINED) // Crea tablas separadas unidas por el ID
 public class Cliente {
+
+    @Id // El email será el identificador único en la DB
+    @Column(name = "email", length = 100)
+    private String email;
+
     private String nombre;
     private String domicilio;
     private String nif;
-    private String email;
-    protected boolean esPremium; // <--- 1. Añadimos el atributo (protected para que los hijos lo vean)
 
-    // 2. Actualizamos el constructor para aceptar 5 parámetros
+    @Column(name = "es_premium")
+    protected boolean esPremium;
+
+    // 1. Constructor vacío (OBLIGATORIO para Hibernate)
+    public Cliente() {
+    }
+
+    // 2. Tu constructor actual (lo mantenemos igual)
     public Cliente(String nombre, String domicilio, String nif, String email, boolean esPremium) {
         this.nombre = nombre;
         this.domicilio = domicilio;
@@ -16,15 +31,12 @@ public class Cliente {
         this.esPremium = esPremium;
     }
 
+    // --- GETTERS Y SETTERS (Mantén los que ya tienes) ---
     public String getNombre(){ return nombre; }
     public String getDomicilio(){ return domicilio; }
     public String getNif(){ return nif; }
     public String getEmail(){ return email; }
-
-    // 3. Añadimos el getter para que el DAO pueda saber si es premium
-    public boolean isPremium() {
-        return esPremium;
-    }
+    public boolean isPremium() { return esPremium; }
 
     public void setNombre(String nombre){ this.nombre = nombre; }
     public void setDomicilio(String domicilio){ this.domicilio = domicilio; }

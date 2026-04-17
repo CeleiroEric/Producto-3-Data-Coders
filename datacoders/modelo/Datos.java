@@ -18,29 +18,23 @@ public class Datos {
 
     /**
      * Constructor principal usado por la aplicación.
-     * MOD (Persona 3): Datos obtiene los DAO desde la fábrica,
-     * manteniendo la Vista y el Controlador sin cambios.
+     * Ahora configurado para usar la factoría de HIBERNATE.
      */
     public Datos() {
-        DAOFactory factory = DAOFactory.getFactory(DAOFactory.MYSQL);
+        // CAMBIO CLAVE: Cambiamos de MYSQL (JDBC) a HIBERNATE (JPA)
+        DAOFactory factory = DAOFactory.getFactory(DAOFactory.HIBERNATE);
 
-        // MOD (Persona 3):
-        // Se usa Objects.requireNonNull para detectar antes y con mensaje claro
-        // si la fábrica aún no devuelve implementaciones reales.
-
+        // Verificamos que la fábrica nos devuelva los DAOs de Hibernate correctamente
         this.ClienteDao = Objects.requireNonNull(factory.getClienteDAO(),
-                "ClienteDao no inicializado en MySqlDAOFactory");
+                "Error: ClienteDao no inicializado en HibernateDAOFactory");
         this.ArticuloDao = Objects.requireNonNull(factory.getArticuloDAO(),
-                "ArticuloDao no inicializado en MySqlDAOFactory");
+                "Error: ArticuloDao no inicializado en HibernateDAOFactory");
         this.PedidoDao = Objects.requireNonNull(factory.getPedidoDAO(),
-                "PedidoDao no inicializado en MySqlDAOFactory");
+                "Error: PedidoDao no inicializado en HibernateDAOFactory");
     }
 
     /**
-     * MOD (Persona 3):
      * Constructor alternativo para pruebas o integración manual.
-     * Permite inyectar DAO concretos sin depender de la fábrica.
-     * No afecta al funcionamiento normal del programa.
      */
     public Datos(ClienteDao ClienteDao, ArticuloDao ArticuloDao, PedidoDao PedidoDao) {
         this.ClienteDao = Objects.requireNonNull(ClienteDao, "ClienteDAO no puede ser null");
@@ -96,25 +90,13 @@ public class Datos {
     // PEDIDOS
     // =========================
 
-    /**
-     * MOD (Persona 3):
-     * Este método ya está adaptado a persistencia.
-     * La implementación real de negocio queda delegada en PedidoDao.
-     * NOTA PARA EL GRUPO:
-     * En Producto 3, PedidoDao debería implementar esta operación usando
-     * JDBC y, preferiblemente, un procedimiento almacenado para crear pedido.
-     */
     public Pedido addPedido(String emailCliente, String datosCliente, String codigoArticulo,
                             int cantidad, LocalDateTime ahora)
             throws ArticuloNoEncontradoException, DuplicadoException {
+        // La lógica se delega al DAO, que ahora usará EntityManager
         return PedidoDao.crearPedido(emailCliente, datosCliente, codigoArticulo, cantidad, ahora);
     }
 
-    /**
-     * MOD (Persona 3):
-     * La lógica de cancelación debe resolverse en PedidoDao
-     * usando persistencia real y, si corresponde, transacción/procedimiento almacenado.
-     */
     public boolean eliminarPedido(int numPedido, LocalDateTime ahora)
             throws PedidoNoEncontradoException, PedidoNoCancelableException {
         return PedidoDao.eliminarPedido(numPedido, ahora);

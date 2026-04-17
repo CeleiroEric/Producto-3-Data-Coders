@@ -1,18 +1,37 @@
 package datacoders.modelo;
 
+import jakarta.persistence.*; // Importante
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+@Entity
+@Table(name = "pedidos")
 public class Pedido {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // El ID se genera solo (1, 2, 3...)
+    @Column(name = "num_pedido")
     private int numPedido;
+
+    @ManyToOne // Relación: Muchos pedidos -> Un Cliente
+    @JoinColumn(name = "cliente_email", nullable = false) // Columna FK en la tabla
     private Cliente cliente;
+
+    @ManyToOne // Relación: Muchos pedidos -> Un Artículo
+    @JoinColumn(name = "articulo_codigo", nullable = false) // Columna FK en la tabla
     private Articulo articulo;
+
     private int cantidad;
+
+    @Column(name = "fecha_hora")
     private LocalDateTime fechaHora;
 
-    // Constructor que usa TiendaOnline
+    // 1. Constructor vacío OBLIGATORIO
+    public Pedido() {
+    }
+
+    // 2. Tu constructor (lo mantenemos igual)
     public Pedido(int numPedido, Cliente cliente, Articulo articulo, int cantidad, LocalDateTime fechaHora) {
         this.numPedido = numPedido;
         this.cliente = Objects.requireNonNull(cliente, "El cliente no puede ser nulo");
@@ -21,58 +40,29 @@ public class Pedido {
         this.fechaHora = (fechaHora == null) ? LocalDateTime.now() : fechaHora;
     }
 
-    /**
-     * Calcula si el pedido se puede cancelar comparando la hora actual
-     * con el tiempo de preparación del artículo.
-     */
+    // --- Lógica de Negocio (Se queda igual, Hibernate no la toca) ---
+
     public boolean esCancelable(LocalDateTime ahora) {
         if (ahora == null) ahora = LocalDateTime.now();
-
-        // Calculamos minutos transcurridos desde la compra
         long minutosPasados = Duration.between(this.fechaHora, ahora).toMinutes();
-
-        // Es cancelable si aún no ha superado el tiempo de preparación
         return minutosPasados < articulo.getTiempoPreparacionMin();
     }
 
-    /**
-     * Calcula el coste total del pedido aplicando lógica de la Persona 2
-     */
     public double calcularTotal() {
         double subtotal = articulo.getPrecioVenta() * cantidad;
         double gastosEnvio = articulo.getGastosEnvio();
-
-        // Lógica de Negocio: Si el cliente es Premium, aplicamos un 20% de descuento en el envío
         if (cliente.isPremium()) {
             gastosEnvio = gastosEnvio * 0.8;
         }
-
         return subtotal + gastosEnvio;
     }
 
-    // --- GETTERS ---
-
-    public int getNumPedido() {
-        return numPedido;
-    }
-
-    public Cliente getCliente() {
-        return cliente;
-    }
-
-    public Articulo getArticulo() {
-        return articulo;
-    }
-
-    public int getCantidad() {
-        return cantidad;
-    }
-
-    public LocalDateTime getFechaHora() {
-        return fechaHora;
-    }
-
-    // --- MÉTODOS ---
+    // --- GETTERS (Iguales) ---
+    public int getNumPedido() { return numPedido; }
+    public Cliente getCliente() { return cliente; }
+    public Articulo getArticulo() { return articulo; }
+    public int getCantidad() { return cantidad; }
+    public LocalDateTime getFechaHora() { return fechaHora; }
 
     @Override
     public String toString() {

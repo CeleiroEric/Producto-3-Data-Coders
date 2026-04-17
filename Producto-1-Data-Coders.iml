@@ -66,5 +66,11 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="hibernate-core-6.4.4.Final" level="project" />
+    <orderEntry type="library" name="DATACODERS" level="project" />
+    <orderEntry type="library" name="DATACODERS1" level="project" />
+    <orderEntry type="library" name="hibernate-commons-annotations-6.0.6.Final" level="project" />
+    <orderEntry type="library" name="DATACODERS2" level="project" />
+    <orderEntry type="library" name="DATACODERS3" level="project" />
   </component>
 </module>

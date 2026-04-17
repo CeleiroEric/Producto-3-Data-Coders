@@ -1,0 +1,25 @@
+<component name="libraryTable">
+  <library name="DATACODERS3">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$" />
+      <root url="jar://$PROJECT_DIR$/lib/antlr4-runtime-4.13.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/byte-buddy-1.14.11.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/classmate-1.5.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hibernate-commons-annotations-6.0.6.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hibernate-core-6.4.4.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/istack-commons-runtime-4.1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jakarta.activation-api-2.1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jakarta.persistence-api-3.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jakarta.transaction-api-2.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jakarta.xml.bind-api-4.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jandex-3.1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jaxb-runtime-4.0.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jboss-logging-3.5.3.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/junit-platform-console-standalone-1.9.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$" />
+    </SOURCES>
+  </library>
+</component>

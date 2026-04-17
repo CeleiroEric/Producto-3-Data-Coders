@@ -1,6 +1,15 @@
 package datacoders.modelo;
 
+import jakarta.persistence.*; // Importante para las anotaciones
+
+@Entity
+@Table(name = "clientes_estandar") // Su propia tabla para datos específicos
 public class ClienteEstandar extends Cliente {
+
+    // 1. Constructor vacío OBLIGATORIO para Hibernate
+    public ClienteEstandar() {
+        super();
+    }
 
     public ClienteEstandar(String nombre, String domicilio, String nif, String email) {
         // Añadimos 'false' al final porque un cliente estándar NO es premium
