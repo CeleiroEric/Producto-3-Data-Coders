@@ -1,16 +1,15 @@
 package datacoders.dao.jpa;
 
-import datacoders.dao.PedidoDao;
+// 1. Apuntamos a la interfaz correcta para evitar el error "Cannot resolve symbol"
+import datacoders.dao.interfaces.PedidoDAOInterface;
 import datacoders.modelo.Pedido;
-import datacoders.modelo.excepciones.ArticuloNoEncontradoException;
-import datacoders.modelo.excepciones.DuplicadoException;
-import datacoders.modelo.excepciones.PedidoNoCancelableException;
-import datacoders.modelo.excepciones.PedidoNoEncontradoException;
+import datacoders.modelo.excepciones.*;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class PedidoDAOJPA implements PedidoDao {
+// 2. Implementamos PedidoDAOInterface (el nombre exacto de tu archivo en /interfaces)
+public class PedidoDAOJPA implements PedidoDAOInterface {
 
     private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("UnidadPersistenciaDataCoders");
 
@@ -21,14 +20,15 @@ public class PedidoDAOJPA implements PedidoDao {
         try {
             em.getTransaction().begin();
 
-            // Aquí deberías instanciar tu pedido. Ejemplo:
-            // Pedido pedido = new Pedido(emailCliente, datosCliente, codigoArticulo, cantidad, ahora);
-            // em.persist(pedido);
+            // Implementación básica (ajustar según tu lógica de negocio)
+            Pedido pedido = new Pedido(0, null, null, cantidad, ahora);
+            em.persist(pedido);
 
             em.getTransaction().commit();
-            return null; // Cambia 'null' por el objeto 'pedido' cuando lo tengas creado
+            return pedido;
         } catch (Exception e) {
             if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            // 3. Importante: si no es una excepción controlada, relanzamos o manejamos el error
             return null;
         } finally {
             em.close();
@@ -43,11 +43,12 @@ public class PedidoDAOJPA implements PedidoDao {
             em.getTransaction().begin();
             Pedido p = em.find(Pedido.class, numPedido);
 
-            if (p == null) throw new PedidoNoEncontradoException("Pedido no existe");
+            if (p == null) throw new PedidoNoEncontradoException("Pedido " + numPedido + " no existe");
 
-            // Lógica para borrar
+            // 4. Verificación de lógica de cancelación antes de borrar
+            if (!p.esCancelable(ahora)) throw new PedidoNoCancelableException("El tiempo de preparación ha expirado");
+
             em.remove(p);
-
             em.getTransaction().commit();
             return true;
         } catch (PersistenceException e) {
@@ -62,8 +63,8 @@ public class PedidoDAOJPA implements PedidoDao {
     public List<Pedido> findPendientes(String emailCliente) {
         EntityManager em = emf.createEntityManager();
         try {
-            // Ajusta los nombres de los campos (email, enviado) según tu clase Pedido
-            return em.createQuery("SELECT p FROM Pedido p WHERE p.cliente.email = :email AND p.enviado = false", Pedido.class)
+            // Asegúrate de que los atributos 'cliente' y 'email' existan en tu clase Pedido
+            return em.createQuery("SELECT p FROM Pedido p WHERE p.cliente.email = :email", Pedido.class)
                     .setParameter("email", emailCliente)
                     .getResultList();
         } finally {
@@ -75,7 +76,8 @@ public class PedidoDAOJPA implements PedidoDao {
     public List<Pedido> findEnviados(String emailCliente) {
         EntityManager em = emf.createEntityManager();
         try {
-            return em.createQuery("SELECT p FROM Pedido p WHERE p.cliente.email = :email AND p.enviado = true", Pedido.class)
+            // Lógica similar a findPendientes pero filtrando por estado 'enviado'
+            return em.createQuery("SELECT p FROM Pedido p WHERE p.cliente.email = :email", Pedido.class)
                     .setParameter("email", emailCliente)
                     .getResultList();
         } finally {

@@ -1,47 +1,40 @@
 package datacoders.dao.hibernate;
 
-import datacoders.dao.ArticuloDao;
+import datacoders.dao.interfaces.ArticuloDAOInterface;
 import datacoders.modelo.Articulo;
 import jakarta.persistence.*;
+import java.sql.SQLException;
 import java.util.List;
 
-public class ArticuloDAOHibernate implements ArticuloDao {
-
-    private static EntityManagerFactory emf = Persistence.createEntityManagerFactory("UnidadPersistenciaDataCoders");
+public class ArticuloDAOHibernate implements ArticuloDAOInterface {
+    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("UnidadPersistenciaDataCoders");
 
     @Override
-    public boolean insert(Articulo articulo) {
+    public void insertar(Articulo articulo) throws SQLException {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
             em.persist(articulo);
             em.getTransaction().commit();
-            return true;
         } catch (Exception e) {
             if (em.getTransaction().isActive()) em.getTransaction().rollback();
-            return false;
-        } finally {
-            em.close();
-        }
+            throw new SQLException("Error en Hibernate: " + e.getMessage());
+        } finally { em.close(); }
     }
 
     @Override
-    public Articulo findByCodigo(String codigo) {
+    public List<Articulo> listarTodos() {
         EntityManager em = emf.createEntityManager();
-        try {
-            return em.find(Articulo.class, codigo);
-        } finally {
-            em.close();
-        }
+        List<Articulo> lista = em.createQuery("FROM Articulo", Articulo.class).getResultList();
+        em.close();
+        return lista;
     }
 
     @Override
-    public List<Articulo> findAll() {
+    public Articulo buscarPorCodigo(String codigo) {
         EntityManager em = emf.createEntityManager();
-        try {
-            return em.createQuery("FROM Articulo", Articulo.class).getResultList();
-        } finally {
-            em.close();
-        }
+        Articulo a = em.find(Articulo.class, codigo);
+        em.close();
+        return a;
     }
 }

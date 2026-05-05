@@ -1,112 +1,88 @@
 package datacoders.modelo;
 
-import datacoders.dao.ClienteDao;
-import datacoders.dao.ArticuloDao;
-import datacoders.dao.PedidoDao;
+import datacoders.dao.interfaces.*;
 import datacoders.factory.DAOFactory;
 import datacoders.modelo.excepciones.*;
-
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 public class Datos {
+    private final ClienteDAOInterface clienteDao;
+    private final ArticuloDAOInterface articuloDao;
+    private final PedidoDAOInterface pedidoDao;
 
-    private final ClienteDao ClienteDao;
-    private final ArticuloDao ArticuloDao;
-    private final PedidoDao PedidoDao;
-
-    /**
-     * Constructor principal usado por la aplicación.
-     * Ahora configurado para usar la factoría de HIBERNATE.
-     */
     public Datos() {
-        // CAMBIO CLAVE: Cambiamos de MYSQL (JDBC) a HIBERNATE (JPA)
-        DAOFactory factory = DAOFactory.getFactory(DAOFactory.HIBERNATE);
-
-        // Verificamos que la fábrica nos devuelva los DAOs de Hibernate correctamente
-        this.ClienteDao = Objects.requireNonNull(factory.getClienteDAO(),
-                "Error: ClienteDao no inicializado en HibernateDAOFactory");
-        this.ArticuloDao = Objects.requireNonNull(factory.getArticuloDAO(),
-                "Error: ArticuloDao no inicializado en HibernateDAOFactory");
-        this.PedidoDao = Objects.requireNonNull(factory.getPedidoDAO(),
-                "Error: PedidoDao no inicializado en HibernateDAOFactory");
+        DAOFactory factory = DAOFactory.getFactory(DAOFactory.MYSQL);
+        this.clienteDao = factory.getClienteDAO();
+        this.articuloDao = factory.getArticuloDAO();
+        this.pedidoDao = factory.getPedidoDAO();
     }
 
-    /**
-     * Constructor alternativo para pruebas o integración manual.
-     */
-    public Datos(ClienteDao ClienteDao, ArticuloDao ArticuloDao, PedidoDao PedidoDao) {
-        this.ClienteDao = Objects.requireNonNull(ClienteDao, "ClienteDAO no puede ser null");
-        this.ArticuloDao = Objects.requireNonNull(ArticuloDao, "ArticuloDAO no puede ser null");
-        this.PedidoDao = Objects.requireNonNull(PedidoDao, "PedidoDao no puede ser null");
-    }
-
-    // =========================
-    // CLIENTES
-    // =========================
-    public boolean addClienteEstandar(String nombre, String domicilio, String nif, String email)
-            throws DuplicadoException {
-        return ClienteDao.insertEstandar(nombre, domicilio, nif, email);
-    }
-
-    public boolean addClientePremium(String nombre, String domicilio, String nif, String email)
-            throws DuplicadoException {
-        return ClienteDao.insertPremium(nombre, domicilio, nif, email);
-    }
-
-    public Cliente buscarClientePorEmail(String email) throws ClienteNoEncontradoException {
-        return ClienteDao.findByEmail(email);
-    }
-
-    public List<Cliente> getClientes() {
-        return ClienteDao.findAll();
-    }
-
-    public List<Cliente> getClientesEstandar() {
-        return ClienteDao.findAllEstandar();
-    }
-
-    public List<Cliente> getClientesPremium() {
-        return ClienteDao.findAllPremium();
-    }
-
-    // =========================
-    // ARTÍCULOS
-    // =========================
-    public boolean addArticulo(Articulo a) throws DuplicadoException {
-        return ArticuloDao.insert(a);
-    }
-
-    public Articulo buscarArticuloPorCodigo(String codigo) throws ArticuloNoEncontradoException {
-        return ArticuloDao.findByCodigo(codigo);
+    // --- ARTÍCULOS ---
+    public boolean addArticulo(Articulo articulo) throws DuplicadoException {
+        try {
+            articuloDao.insertar(articulo);
+            return true;
+        } catch (SQLException e) {
+            // Imprime el error en la consola roja para que sepas qué falla (columna, tipo de dato, etc.)
+            e.printStackTrace();
+            throw new DuplicadoException("Error BD: " + e.getMessage());
+        }
     }
 
     public List<Articulo> getArticulos() {
-        return ArticuloDao.findAll();
+        return articuloDao.listarTodos();
     }
 
-    // =========================
-    // PEDIDOS
-    // =========================
+    public Articulo buscarArticuloPorCodigo(String codigo) throws ArticuloNoEncontradoException {
+        Articulo a = articuloDao.buscarPorCodigo(codigo);
+        if (a == null) throw new ArticuloNoEncontradoException(codigo);
+        return a;
+    }
 
-    public Pedido addPedido(String emailCliente, String datosCliente, String codigoArticulo,
-                            int cantidad, LocalDateTime ahora)
+    // --- CLIENTES ---
+    public boolean addClienteEstandar(String nombre, String domicilio, String nif, String email) throws DuplicadoException {
+        try {
+            Cliente c = new ClienteEstandar(nombre, domicilio, nif, email);
+            return clienteDao.insertar(c);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DuplicadoException("Error al añadir cliente: " + e.getMessage());
+        }
+    }
+
+    public boolean addClientePremium(String nombre, String domicilio, String nif, String email) throws DuplicadoException {
+        try {
+            Cliente c = new ClientePremium(nombre, domicilio, nif, email);
+            return clienteDao.insertar(c);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DuplicadoException("Error al añadir cliente: " + e.getMessage());
+        }
+    }
+
+    public List<Cliente> getClientes() { return clienteDao.listarTodos(); }
+    public List<Cliente> getClientesEstandar() { return clienteDao.listarEstandar(); }
+    public List<Cliente> getClientesPremium() { return clienteDao.listarPremium(); }
+
+    public Cliente buscarClientePorEmail(String email) throws ClienteNoEncontradoException {
+        Cliente c = clienteDao.buscarPorEmail(email);
+        if (c == null) throw new ClienteNoEncontradoException(email);
+        return c;
+    }
+
+    // --- PEDIDOS ---
+    public Pedido addPedido(String email, String datos, String codigo, int cant, LocalDateTime ahora)
             throws ArticuloNoEncontradoException, DuplicadoException {
-        // La lógica se delega al DAO, que ahora usará EntityManager
-        return PedidoDao.crearPedido(emailCliente, datosCliente, codigoArticulo, cantidad, ahora);
+        return pedidoDao.crearPedido(email, datos, codigo, cant, ahora);
     }
 
-    public boolean eliminarPedido(int numPedido, LocalDateTime ahora)
+    public boolean eliminarPedido(int num, LocalDateTime ahora)
             throws PedidoNoEncontradoException, PedidoNoCancelableException {
-        return PedidoDao.eliminarPedido(numPedido, ahora);
+        return pedidoDao.eliminarPedido(num, ahora);
     }
 
-    public List<Pedido> getPedidosPendientes(String emailCliente) {
-        return PedidoDao.findPendientes(emailCliente);
-    }
-
-    public List<Pedido> getPedidosEnviados(String emailCliente) {
-        return PedidoDao.findEnviados(emailCliente);
-    }
+    public List<Pedido> getPedidosPendientes(String email) { return pedidoDao.findPendientes(email); }
+    public List<Pedido> getPedidosEnviados(String email) { return pedidoDao.findEnviados(email); }
 }

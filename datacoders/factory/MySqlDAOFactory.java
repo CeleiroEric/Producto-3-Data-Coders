@@ -1,27 +1,20 @@
 package datacoders.factory;
-
-import datacoders.dao.ArticuloDao;
-import datacoders.dao.ClienteDao;
-import datacoders.dao.PedidoDao;
-import datacoders.dao.mysql.MySqlArticuloDAO;
-import datacoders.dao.mysql.MySqlClienteDAO;
-import datacoders.dao.mysql.MySqlPedidoDAO;
-
+import datacoders.dao.interfaces.*;
+import datacoders.dao.mysql.*;
 
 public class MySqlDAOFactory extends DAOFactory {
+    @Override
+    public ArticuloDAOInterface getArticuloDAO() {
+        return new MySqlArticuloDAO(); // ¡Ya no dará error!
+    }
 
     @Override
-    public ClienteDao getClienteDAO() {
+    public ClienteDAOInterface getClienteDAO() {
         return new MySqlClienteDAO();
     }
 
     @Override
-    public ArticuloDao getArticuloDAO() {
-        return new MySqlArticuloDAO();
-    }
-
-    @Override
-    public PedidoDao getPedidoDAO() {
+    public PedidoDAOInterface getPedidoDAO() {
         return new MySqlPedidoDAO();
     }
 }

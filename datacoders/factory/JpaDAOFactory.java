@@ -1,22 +1,30 @@
 package datacoders.factory;
 
-import datacoders.dao.*; // Para las interfaces
-import datacoders.dao.jpa.*; // Aquí está el cambio: importa la carpeta jpa directamente
+// 1. IMPORTANTE: Usamos las interfaces de la carpeta interfaces
+import datacoders.dao.interfaces.ArticuloDAOInterface;
+import datacoders.dao.interfaces.ClienteDAOInterface;
+import datacoders.dao.interfaces.PedidoDAOInterface;
 
+// 2. Importamos las implementaciones de JPA
+import datacoders.dao.jpa.ArticuloDAOJPA;
+import datacoders.dao.jpa.ClienteDAOJPA;
+import datacoders.dao.jpa.PedidoDAOJPA;
 
 public class JpaDAOFactory extends DAOFactory {
+
     @Override
-    public ArticuloDao getArticuloDAO() {
+    public ArticuloDAOInterface getArticuloDAO() {
+        // Asegúrate de que ArticuloDAOJPA implemente ArticuloDAOInterface
         return new ArticuloDAOJPA();
     }
 
     @Override
-    public ClienteDao getClienteDAO() {
+    public ClienteDAOInterface getClienteDAO() {
         return new ClienteDAOJPA();
     }
 
     @Override
-    public PedidoDao getPedidoDAO() {
+    public PedidoDAOInterface getPedidoDAO() {
         return new PedidoDAOJPA();
     }
 }

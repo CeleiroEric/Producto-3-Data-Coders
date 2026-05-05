@@ -1,6 +1,6 @@
 package datacoders.modelo;
 
-import jakarta.persistence.*; // Importante
+import jakarta.persistence.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -10,28 +10,29 @@ import java.util.Objects;
 public class Pedido {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // El ID se genera solo (1, 2, 3...)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "num_pedido")
     private int numPedido;
 
-    @ManyToOne // Relación: Muchos pedidos -> Un Cliente
-    @JoinColumn(name = "cliente_email", nullable = false) // Columna FK en la tabla
+    // Vinculamos con cliente_email que es lo que tienes en MySQL
+    @ManyToOne
+    @JoinColumn(name = "cliente_email", referencedColumnName = "email", nullable = false)
     private Cliente cliente;
 
-    @ManyToOne // Relación: Muchos pedidos -> Un Artículo
-    @JoinColumn(name = "articulo_codigo", nullable = false) // Columna FK en la tabla
+    // Vinculamos con articulo_codigo que es lo que tienes en MySQL
+    @ManyToOne
+    @JoinColumn(name = "articulo_codigo", referencedColumnName = "codigo", nullable = false)
     private Articulo articulo;
 
+    @Column(name = "cantidad")
     private int cantidad;
 
     @Column(name = "fecha_hora")
     private LocalDateTime fechaHora;
 
-    // 1. Constructor vacío OBLIGATORIO
     public Pedido() {
     }
 
-    // 2. Tu constructor (lo mantenemos igual)
     public Pedido(int numPedido, Cliente cliente, Articulo articulo, int cantidad, LocalDateTime fechaHora) {
         this.numPedido = numPedido;
         this.cliente = Objects.requireNonNull(cliente, "El cliente no puede ser nulo");
@@ -40,10 +41,9 @@ public class Pedido {
         this.fechaHora = (fechaHora == null) ? LocalDateTime.now() : fechaHora;
     }
 
-    // --- Lógica de Negocio (Se queda igual, Hibernate no la toca) ---
-
     public boolean esCancelable(LocalDateTime ahora) {
         if (ahora == null) ahora = LocalDateTime.now();
+        // Usamos tiempoPreparacionMin que es el nombre de tu atributo en Articulo
         long minutosPasados = Duration.between(this.fechaHora, ahora).toMinutes();
         return minutosPasados < articulo.getTiempoPreparacionMin();
     }
@@ -51,13 +51,17 @@ public class Pedido {
     public double calcularTotal() {
         double subtotal = articulo.getPrecioVenta() * cantidad;
         double gastosEnvio = articulo.getGastosEnvio();
-        if (cliente.isPremium()) {
-            gastosEnvio = gastosEnvio * 0.8;
+
+        // Corrección del error 'Cannot resolve method getDescuentoEnvio'
+        if (cliente instanceof ClientePremium) {
+            // Suponiendo que el descuento se guarda como porcentaje (ej: 20 para 20%)
+            double descuento = ((ClientePremium) cliente).getDescuentoEnvio();
+            gastosEnvio = gastosEnvio * (1 - (descuento / 100));
         }
         return subtotal + gastosEnvio;
     }
 
-    // --- GETTERS (Iguales) ---
+    // Getters
     public int getNumPedido() { return numPedido; }
     public Cliente getCliente() { return cliente; }
     public Articulo getArticulo() { return articulo; }
@@ -67,21 +71,9 @@ public class Pedido {
     @Override
     public String toString() {
         return "Pedido #" + numPedido +
-                " [Cliente: " + cliente.getNombre() +
-                ", Articulo: " + articulo.getDescripcion() +
-                ", Total: " + String.format("%.2f", calcularTotal()) + "€]";
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Pedido)) return false;
-        Pedido pedido = (Pedido) o;
-        return numPedido == pedido.numPedido;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(numPedido);
+                " | Cliente: " + cliente.getNombre() +
+                " | Articulo: " + articulo.getDescripcion() +
+                " | Cant: " + cantidad +
+                " | Total: " + String.format("%.2f", calcularTotal()) + "€";
     }
 }

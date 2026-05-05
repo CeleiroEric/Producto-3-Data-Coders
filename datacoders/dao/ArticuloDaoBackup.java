@@ -6,7 +6,7 @@ import datacoders.modelo.excepciones.DuplicadoException;
 
 import java.util.List;
 
-public interface ArticuloDao {
+public interface ArticuloDaoBackup {
     boolean insert(Articulo a) throws DuplicadoException;
     Articulo findByCodigo(String codigo) throws ArticuloNoEncontradoException;
     List<Articulo> findAll();

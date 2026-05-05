@@ -1,103 +1,84 @@
 package datacoders.dao.jpa;
 
-import datacoders.dao.ClienteDao;
+import datacoders.dao.interfaces.ClienteDAOInterface;
 import datacoders.modelo.Cliente;
 import datacoders.modelo.ClienteEstandar;
 import datacoders.modelo.ClientePremium;
-import datacoders.modelo.excepciones.ClienteNoEncontradoException;
-import datacoders.modelo.excepciones.DuplicadoException;
 import jakarta.persistence.*;
+import java.sql.SQLException;
 import java.util.List;
 
-public class ClienteDAOJPA implements ClienteDao {
+public class ClienteDAOJPA implements ClienteDAOInterface {
 
     private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("UnidadPersistenciaDataCoders");
 
     @Override
-    public boolean insertEstandar(String nombre, String domicilio, String nif, String email) throws DuplicadoException {
+    public boolean insertar(Cliente cliente) throws SQLException {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
-            // Verificamos si ya existe.
-            // IMPORTANTE: He añadido un mensaje al constructor para solucionar tu error de "cannot be applied to given types"
-            if (em.find(Cliente.class, email) != null) {
-                throw new DuplicadoException("El cliente con email " + email + " ya existe.");
-            }
-
-            em.persist(new ClienteEstandar(nombre, domicilio, nif, email));
+            em.persist(cliente);
             em.getTransaction().commit();
             return true;
-        } catch (PersistenceException e) {
-            if (em.getTransaction().isActive()) em.getTransaction().rollback();
-            return false;
-        } finally {
-            em.close();
-        }
-    }
-
-    @Override
-    public boolean insertPremium(String nombre, String domicilio, String nif, String email) throws DuplicadoException {
-        EntityManager em = emf.createEntityManager();
-        try {
-            em.getTransaction().begin();
-            // Añadido mensaje al constructor
-            if (em.find(Cliente.class, email) != null) {
-                throw new DuplicadoException("El cliente con email " + email + " ya existe.");
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
             }
-
-            em.persist(new ClientePremium(nombre, domicilio, nif, email));
-            em.getTransaction().commit();
-            return true;
-        } catch (PersistenceException e) {
-            if (em.getTransaction().isActive()) em.getTransaction().rollback();
-            return false;
+            // Lanzamos SQLException para que la capa de Datos.java la capture como DuplicadoException
+            throw new SQLException("Error al insertar cliente en JPA: " + e.getMessage());
         } finally {
-            em.close();
-        }
-    }
-
-    @Override
-    public Cliente findByEmail(String email) throws ClienteNoEncontradoException {
-        EntityManager em = emf.createEntityManager();
-        try {
-            Cliente c = em.find(Cliente.class, email);
-            // Añadido mensaje al constructor
-            if (c == null) {
-                throw new ClienteNoEncontradoException("No se ha encontrado ningún cliente con el email: " + email);
+            if (em != null && em.isOpen()) {
+                em.close();
             }
-            return c;
-        } finally {
-            em.close();
         }
     }
 
     @Override
-    public List<Cliente> findAll() {
+    public List<Cliente> listarTodos() {
         EntityManager em = emf.createEntityManager();
         try {
             return em.createQuery("SELECT c FROM Cliente c", Cliente.class).getResultList();
         } finally {
-            em.close();
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
         }
     }
 
     @Override
-    public List<Cliente> findAllEstandar() {
+    public List<Cliente> listarEstandar() {
         EntityManager em = emf.createEntityManager();
         try {
             return em.createQuery("SELECT c FROM ClienteEstandar c", Cliente.class).getResultList();
         } finally {
-            em.close();
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
         }
     }
 
     @Override
-    public List<Cliente> findAllPremium() {
+    public List<Cliente> listarPremium() {
         EntityManager em = emf.createEntityManager();
         try {
             return em.createQuery("SELECT c FROM ClientePremium c", Cliente.class).getResultList();
         } finally {
-            em.close();
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
+    }
+
+    @Override
+    public Cliente buscarPorEmail(String email) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            // Buscamos directamente por la clave primaria (email)
+            return em.find(Cliente.class, email);
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
         }
     }
 }

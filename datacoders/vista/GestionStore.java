@@ -3,6 +3,7 @@ package datacoders.vista;
 import datacoders.modelo.*;
 import datacoders.controlador.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class GestionStore {
 
@@ -15,7 +16,7 @@ public class GestionStore {
     public void inicio() {
         boolean salir = false;
         do {
-            System.out.println("\n===== GESTIÓN TIENDA ONLINE =====");
+            System.out.println("\n===== GESTIÓN TIENDA ONLINE (CONSOLA) =====");
             System.out.println("1. Gestión de Artículos");
             System.out.println("2. Gestión de Clientes");
             System.out.println("3. Gestión de Pedidos");
@@ -54,7 +55,12 @@ public class GestionStore {
                 System.out.println("Error: " + e.getMessage());
             }
         } else {
-            System.out.println(controlador.getArticulos());
+            System.out.println("\nCÓDIGO | DESCRIPCIÓN | PRECIO | GASTOS");
+            System.out.println("---------------------------------------");
+            for (Articulo a : controlador.getArticulos()) {
+                // CORRECCIÓN: Usamos getPrecioVenta() que es el nombre real en tu modelo
+                System.out.println(a.getCodigo() + " | " + a.getDescripcion() + " | " + a.getPrecioVenta() + "€ | " + a.getGastosEnvio() + "€");
+            }
         }
     }
 
@@ -62,9 +68,9 @@ public class GestionStore {
     private void menuClientes() {
         System.out.println("\n-- CLIENTES --");
         System.out.println("1. Añadir Cliente");
-        System.out.println("2. Mostrar Todos los Clientes");
-        System.out.println("3. Mostrar Clientes Estándar");
-        System.out.println("4. Mostrar Clientes Premium");
+        System.out.println("2. Mostrar Todos");
+        System.out.println("3. Mostrar Estándar");
+        System.out.println("4. Mostrar Premium");
 
         int opt = LeerDatos.leerEntero("Selecciona: ");
 
@@ -87,17 +93,22 @@ public class GestionStore {
                 System.out.println("Error: " + e.getMessage());
             }
 
-        } else if (opt == 2) {
-            System.out.println("--- Lista de todos los Clientes ---");
-            System.out.println(controlador.getClientes());
+        } else {
+            List<Cliente> lista;
+            if (opt == 3) lista = controlador.getClientesEstandar();
+            else if (opt == 4) lista = controlador.getClientesPremium();
+            else lista = controlador.getClientes();
 
-        } else if (opt == 3) {
-            System.out.println("--- Clientes Estándar ---");
-            System.out.println(controlador.getClientesEstandar());
-
-        } else if (opt == 4) {
-            System.out.println("--- Clientes Premium ---");
-            System.out.println(controlador.getClientesPremium());
+            System.out.println("\nEMAIL | NOMBRE | NIF | TIPO | EXTRA");
+            System.out.println("---------------------------------------");
+            for (Cliente c : lista) {
+                String tipoCli = (c instanceof ClientePremium) ? "PREMIUM" : "ESTANDAR";
+                String extra = "";
+                if (c instanceof ClientePremium) {
+                    extra = " | Cuota: " + ((ClientePremium) c).getCuotaAnual() + "€";
+                }
+                System.out.println(c.getEmail() + " | " + c.getNombre() + " | " + c.getNif() + " | " + tipoCli + extra);
+            }
         }
     }
 
@@ -117,31 +128,26 @@ public class GestionStore {
                     String cod = LeerDatos.leerTexto("Código Artículo: ");
                     int cant = LeerDatos.leerEntero("Cantidad: ");
 
-                    // MOD (Persona 3):
-                    // Se recogen los datos del cliente por si no existe y hay que registrarlo.
-                    String nombre = LeerDatos.leerTexto("Nombre del cliente (si no existe): ");
-                    String domicilio = LeerDatos.leerTexto("Domicilio del cliente (si no existe): ");
-                    String nif = LeerDatos.leerTexto("NIF del cliente (si no existe): ");
-                    String tipo = LeerDatos.leerTexto("Tipo del cliente (Estandar/Premium): ");
-
-                    String datosCliente = nombre + "|" + domicilio + "|" + nif + "|" + tipo;
-
-                    controlador.addPedido(email, datosCliente, cod, cant, LocalDateTime.now());
-
-                    System.out.println("Pedido añadido con éxito.");
+                    // Nota: El controlador gestiona si el cliente existe o no
+                    controlador.addPedido(email, "Nuevo Cliente", cod, cant, LocalDateTime.now());
+                    System.out.println("Pedido registrado con éxito.");
                 }
                 case 2 -> {
                     int num = LeerDatos.leerEntero("Número de pedido a cancelar: ");
                     controlador.eliminarPedido(num, LocalDateTime.now());
-                    System.out.println("Pedido cancelado (si cumplía las condiciones).");
+                    System.out.println("Acción procesada.");
                 }
-                case 3 -> {
-                    String email = LeerDatos.leerTexto("Email del cliente (o dejar vacío): ");
-                    System.out.println(controlador.getPedidosPendientes(email));
-                }
-                case 4 -> {
-                    String email = LeerDatos.leerTexto("Email del cliente (o dejar vacío): ");
-                    System.out.println(controlador.getPedidosEnviados(email));
+                case 3, 4 -> {
+                    String email = LeerDatos.leerTexto("Filtrar por email (vacío para todos): ");
+                    List<Pedido> pedidos = (opt == 3) ? controlador.getPedidosPendientes(email) : controlador.getPedidosEnviados(email);
+
+                    if (pedidos.isEmpty()) {
+                        System.out.println("No hay pedidos para mostrar.");
+                    } else {
+                        for (Pedido p : pedidos) {
+                            System.out.println(p.toString());
+                        }
+                    }
                 }
             }
         } catch (Exception e) {
