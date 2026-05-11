@@ -4,36 +4,72 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "clientes")
-@Inheritance(strategy = InheritanceType.JOINED)
-public class Cliente {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "tipo_cliente", discriminatorType = DiscriminatorType.STRING)
+public abstract class Cliente {
+
     @Id
-    @Column(name = "email", length = 100)
+    @Column(name = "email")
     private String email;
+
+    @Column(name = "nombre")
     private String nombre;
+
+    @Column(name = "domicilio")
     private String domicilio;
+
+    @Column(name = "nif")
     private String nif;
 
-    @Column(name = "es_premium")
-    protected boolean esPremium;
+    public Cliente() {
+    }
 
-    public Cliente() {}
-
-    public Cliente(String nombre, String domicilio, String nif, String email, boolean esPremium) {
+    public Cliente(String nombre, String domicilio, String nif, String email) {
         this.nombre = nombre;
         this.domicilio = domicilio;
         this.nif = nif;
         this.email = email;
-        this.esPremium = esPremium;
     }
 
-    // Getters necesarios para la tabla
-    public String getNombre(){ return nombre; }
-    public String getNif(){ return nif; }
-    public String getEmail(){ return email; }
-    public String getDomicilio(){ return domicilio; }
-    public boolean isPremium() { return esPremium; }
+    public String getEmail() {
+        return email;
+    }
 
-    public double getFactorEnvio(Articulo articulo) {
-        return articulo.getGastosEnvio();
+    public String getNombre() {
+        return nombre;
+    }
+
+    public String getDomicilio() {
+        return domicilio;
+    }
+
+    public String getNif() {
+        return nif;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void setDomicilio(String domicilio) {
+        this.domicilio = domicilio;
+    }
+
+    public void setNif(String nif) {
+        this.nif = nif;
+    }
+
+    @Override
+    public String toString() {
+        return "Cliente{" +
+                "email='" + email + '\'' +
+                ", nombre='" + nombre + '\'' +
+                ", domicilio='" + domicilio + '\'' +
+                ", nif='" + nif + '\'' +
+                '}';
     }
 }

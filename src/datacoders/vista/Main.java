@@ -1,6 +1,7 @@
 package datacoders.vista;
 
 import datacoders.controlador.Controlador;
+import datacoders.modelo.util.JPAUtil;
 import javafx.application.Application;
 import javafx.scene.Scene;
 
@@ -16,6 +17,11 @@ public class Main extends Application {
         primaryStage.setTitle("DataCoders - Sistema de Gestión Profesional");
         primaryStage.setScene(escena);
         primaryStage.show();
+    }
+
+    @Override
+    public void stop() {
+        JPAUtil.close();
     }
 
     public static void main(String[] args) {

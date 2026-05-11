@@ -107,12 +107,12 @@ public class SeccionClientes extends VBox {
                 limpiar();
                 btnTodos.fire();
                 new Alert(Alert.AlertType.INFORMATION, "Cliente añadido correctamente").show();
-
-            } catch (DuplicadoException ex) {
-                new Alert(Alert.AlertType.WARNING, "El email ya existe").show();
-            } catch (Exception ex) {
-                new Alert(Alert.AlertType.ERROR, "Error: " + ex.getMessage()).show();
             }
+
+                catch (DuplicadoException ex) {
+                    ex.printStackTrace();
+                    new Alert(Alert.AlertType.ERROR, ex.getMessage()).show();
+                }
         });
 
         btnTodos.setOnAction(e -> tablaClientes.getItems().setAll(controlador.getClientes()));
